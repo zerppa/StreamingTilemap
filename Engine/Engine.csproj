@@ -1,0 +1,109 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <CodeAnalysisRuleSet>.\Engine.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\Zero\Documents\Visual Studio 2017\Projects\Tilester\Engine\Engine.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\tileset.png" />
+    <None Remove="Basic-Fragment.300.glsles" />
+    <None Remove="Basic-Fragment.330.glsl" />
+    <None Remove="Basic-Fragment.450.glsl" />
+    <None Remove="Basic-Fragment.450.spv" />
+    <None Remove="Basic-Fragment.hlsl" />
+    <None Remove="Basic-Fragment.hlsl.bytes" />
+    <None Remove="Basic-Fragment.metal" />
+    <None Remove="Basic-Fragment.metallib" />
+    <None Remove="Basic-Vertex.300.glsles" />
+    <None Remove="Basic-Vertex.330.glsl" />
+    <None Remove="Basic-Vertex.450.glsl" />
+    <None Remove="Basic-Vertex.450.spv" />
+    <None Remove="Basic-Vertex.hlsl" />
+    <None Remove="Basic-Vertex.hlsl.bytes" />
+    <None Remove="Basic-Vertex.metal" />
+    <None Remove="Basic-Vertex.metallib" />
+    <None Remove="Maps\Overworld\-1,-1.chunk" />
+    <None Remove="Maps\Overworld\-1,0.chunk" />
+    <None Remove="Maps\Overworld\-1,1.chunk" />
+    <None Remove="Maps\Overworld\0,-1.chunk" />
+    <None Remove="Maps\Overworld\0,0.chunk" />
+    <None Remove="Maps\Overworld\0,1.chunk" />
+    <None Remove="Maps\Overworld\1,-1.chunk" />
+    <None Remove="Maps\Overworld\1,0.chunk" />
+    <None Remove="Maps\Overworld\1,1.chunk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\tileset.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\-1,-1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\-1,0.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\-1,1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\0,-1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\0,0.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\0,1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\1,-1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\1,0.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Maps\Overworld\1,1.chunk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Basic-Fragment.300.glsles" />
+    <EmbeddedResource Include="Basic-Fragment.450.glsl" />
+    <EmbeddedResource Include="Basic-Fragment.450.spv" />
+    <EmbeddedResource Include="Basic-Fragment.hlsl" />
+    <EmbeddedResource Include="Basic-Fragment.hlsl.bytes" />
+    <EmbeddedResource Include="Basic-Fragment.metal" />
+    <EmbeddedResource Include="Basic-Fragment.metallib" />
+    <EmbeddedResource Include="Basic-Vertex.300.glsles" />
+    <EmbeddedResource Include="Basic-Vertex.450.glsl" />
+    <EmbeddedResource Include="Basic-Vertex.450.spv" />
+    <EmbeddedResource Include="Basic-Vertex.hlsl" />
+    <EmbeddedResource Include="Basic-Vertex.hlsl.bytes" />
+    <EmbeddedResource Include="Basic-Vertex.metal" />
+    <EmbeddedResource Include="Basic-Vertex.metallib" />
+    <EmbeddedResource Include="Basic-Fragment.330.glsl" />
+    <EmbeddedResource Include="Basic-Vertex.330.glsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Veldrid.ImageSharp" Version="4.5.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.5.0" />
+    <PackageReference Include="Veldrid.Utilities" Version="4.5.0" />
+  </ItemGroup>
+
+</Project>

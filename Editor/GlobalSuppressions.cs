@@ -1,0 +1,1 @@
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name must match first type name", Justification = "Reviewed. Suppression is OK here.", Scope = "type", Target = "~T:Editor.Command`1")]

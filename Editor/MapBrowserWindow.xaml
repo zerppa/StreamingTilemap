@@ -1,0 +1,55 @@
+﻿<Window x:Class="Editor.MapBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Editor"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow"
+        SizeToContent="WidthAndHeight"
+        Topmost="True"
+        Title="Maps"
+        UseLayoutRounding="True"
+        d:DataContext ="{d:DesignInstance {x:Type local:MapBrowserViewModel}, IsDesignTimeCreatable=False}">
+    <Grid Width="200" MaxHeight="{Binding Path=MainWindow.ActualHeight, Source={x:Static Application.Current}, Mode=OneWay, FallbackValue=400}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Preview -->
+        <Border Grid.Row="0" Width="200" Height="200" Background="Black">
+            <Image Source="{Binding Preview, Mode=OneWay}" Stretch="Fill"/>
+        </Border>
+
+        <!-- List -->
+        <ListBox Grid.Row="1" ItemsSource="{Binding Maps, Mode=OneWay}" SelectedItem="{Binding CurrentMap, Mode=TwoWay}" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Command="{Binding CleanCommand, Mode=OneWay}" CommandParameter="{Binding}" VerticalAlignment="Center">Clean</Button>
+                            <Button Command="{Binding DeleteCommand, Mode=OneWay}" CommandParameter="{Binding}" VerticalAlignment="Center">Del</Button>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Add new -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding NewMapName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Command="{Binding CreateNewMapCommand, Mode=OneWay}" CommandParameter="{Binding NewMapName, Mode=OneWay}" VerticalAlignment="Center">New</Button>
+        </Grid>
+    </Grid>
+</Window>

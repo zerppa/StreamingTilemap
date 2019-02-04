@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Engine</name>
+    </assembly>
+    <members>
+        <member name="T:Engine.Chunk">
+            <summary>
+            Represents a chunk (tilemaps are made out of chunks).
+            </summary>
+        </member>
+        <member name="F:Engine.Chunk.syncRoot">
+            <summary>
+            The lock for multi-threaded access.
+            </summary>
+        </member>
+        <member name="F:Engine.Chunk.IsInUse">
+            <summary>
+            The flag indicating whether this chunk is currently active (and not in the pool).
+            </summary>
+        </member>
+        <member name="F:Engine.Chunk.currentBuffer">
+            <summary>
+            Points to the currently used tile buffer.
+            </summary>
+        </member>
+        <member name="F:Engine.Chunk.backBuffer">
+            <summary>
+            Points to the currently used tile buffer.
+            </summary>
+        </member>
+        <member name="F:Engine.Chunk.hasPendingChanges">
+            <summary>
+            Stores a flag indicating whether the tile buffer has been rewritten.
+            </summary>
+        </member>
+        <member name="M:Engine.Chunk.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.Chunk"/> class.
+            </summary>
+        </member>
+        <member name="P:Engine.Chunk.X">
+            <summary>
+            Gets or sets the X coordinate, in chunk units.
+            </summary>
+        </member>
+        <member name="P:Engine.Chunk.Y">
+            <summary>
+            Gets or sets the Y coordinate, in chunk units.
+            </summary>
+        </member>
+        <member name="P:Engine.Chunk.Tiles">
+            <summary>
+            Gets the tile array.
+            </summary>
+            <remarks>
+            Although chunks are 2-dimensional, the tiles are stored in a 1-dimensional array for performance reasons.
+            Calculate the tile index manually using <see cref="F:Engine.Configuration.ChunkWidth"/> and <see cref="F:Engine.Configuration.ChunkHeight"/>.
+            </remarks>>
+        </member>
+        <member name="M:Engine.Chunk.Clear">
+            <summary>
+            Resets all properties.
+            </summary>
+        </member>
+        <member name="M:Engine.Chunk.ApplyPendingChanges">
+            <summary>
+            Flips the tile buffers if there are pending changes.
+            </summary>
+        </member>
+        <member name="M:Engine.Chunk.SetData(System.Int32,System.Int32,System.UInt16[])">
+            <summary>
+            Updates the chunk based on the supplied information.
+            The tile data in <paramref name="data"/> is copied to the chunk's internal array.
+            The <paramref name="data"/> array size should be exactly <c>ChunkWidth * ChunkHeight</c>.
+            </summary>
+            <param name="x">The chunk X coordinate, in chunk units.</param>
+            <param name="y">The chunk Y coordinate, in chunk units.</param>
+            <param name="data">The data.</param>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="data"/> cannot be <c>null</c>.</exception>
+        </member>
+        <member name="T:Engine.ChunkManager">
+            <summary>
+            Manages the set of active chunks around the camera.
+            </summary>
+            <seealso cref="T:System.IDisposable" />
+        </member>
+        <member name="F:Engine.ChunkManager.EmptyChunkData">
+            <summary>
+            Represents the empty default tile data for an unloaded chunk.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkManager.chunkPool">
+            <summary>
+            Stores the internal chunk pool.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkManager.chunkCache">
+            <summary>
+            Stores the list of currently managed active chunks.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkManager.doomedChunks">
+            <summary>
+            The temporary list of chunks that have fallen off the managed area and are subject of being recycled.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkManager.preCalculatedNearbyChunkOffsets">
+            <summary>
+            Contains the pre-calculated ordered list of offsets that can be applied to chunk coordinates
+            in order to create a spiral outwards of it until it exceeds the view range from the origin.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkManager.chunkProcessor">
+            <summary>
+            Stores the internal chunk processor.
+            </summary>
+        </member>
+        <member name="M:Engine.ChunkManager.#ctor(Engine.ContentManager)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.ChunkManager"/> class.
+            </summary>
+            <param name="contentManager">The content manager.</param>
+        </member>
+        <member name="M:Engine.ChunkManager.SetCameraAt(System.Int32,System.Int32)">
+            <summary>
+            Sets the focused chunk where the camera is centered at and updates the managed chunk list accordingly.
+            Chunks that are too far off from the focused chunk will be recycled.
+            New chunks are then asynchronously loaded surrounding the focused chunk.
+            </summary>
+            <param name="chunkX">The focus chunk X coordinate, in chunk units.</param>
+            <param name="chunkY">The focus chunk Y coordinate, in chunk units.</param>
+        </member>
+        <member name="M:Engine.ChunkManager.ApplyAllPendingChanges">
+            <summary>
+            Applies all pending chunk changes.
+            </summary>
+            <remarks>This method should be called from the main thread.</remarks>
+        </member>
+        <member name="M:Engine.ChunkManager.GetChunkData(System.Int32,System.Int32)">
+            <summary>
+            Requests the tile data for the specific chunk. If no data is available at those coordinates, an empty array (of suitable size) is returned.
+            </summary>
+            <param name="chunkX">The chunk X coordinate, in chunk units.</param>
+            <param name="chunkY">The chunk Y coordinate, in chunk units.</param>
+            <returns>The array containing tile data for the chunk.</returns>
+            <remarks>
+            The empty default array is cached, and will be the same instance every time.
+            The array is mutable, but you should never do that.
+            </remarks>
+        </member>
+        <member name="M:Engine.ChunkManager.IsChunkDataAvailable(System.Int32,System.Int32)">
+            <summary>
+            Determines whether tile data is available for the specified chunk.
+            </summary>
+            <param name="chunkX">The chunk X coordinate, in chunk units.</param>
+            <param name="chunkY">The chunk Y coordinate, in chunk units.</param>
+            <returns>
+            <c>true</c> if the chunk is currently being managed; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Engine.ChunkManager.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.ChunkManager.GetChunksAround(System.Int32,System.Int32)">
+            <summary>
+            Gets the chunks surrounding and including the center chunk.
+            The returned collection is sorted from closest to farthest.
+            </summary>
+            <param name="centerChunkX">The center chunk X coordinate, in chunk units.</param>
+            <param name="centerChunkY">The center chunk Y coordinate, in chunk units.</param>
+            <returns>Collection of chunk coordinates.</returns>
+        </member>
+        <member name="T:Engine.ChunkProcessor">
+            <summary>
+            Provides asynchronous chunk loading services.
+            </summary>
+            <seealso cref="T:System.IDisposable" />
+        </member>
+        <member name="F:Engine.ChunkProcessor.contentManager">
+            <summary>
+            Stores the content manager.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkProcessor.jobProcessor">
+            <summary>
+            The producer-consumer implementation.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkProcessor.queuedJobs">
+            <summary>
+            Keeps track of the currently queued chunks.
+            </summary>
+        </member>
+        <member name="F:Engine.ChunkProcessor.origin">
+            <summary>
+            The origin around which chunks are managed. Loading jobs that are too far away from the origin will be skipped.
+            </summary>
+        </member>
+        <member name="M:Engine.ChunkProcessor.#ctor(Engine.ContentManager)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.ChunkProcessor"/> class.
+            </summary>
+            <param name="contentManager">The content manager.</param>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="contentManager"/> cannot be <c>null</c>.</exception>
+        </member>
+        <member name="M:Engine.ChunkProcessor.Enqueue(System.ValueTuple{System.Int32,System.Int32},Engine.Chunk)">
+            <summary>
+            Places an order for the certain chunk's data to be loaded and populated.
+            </summary>
+            <param name="position">The chunk's position, in chunk units.</param>
+            <param name="chunk">The target <see cref="T:Engine.Chunk"/> object, whom the loaded data is pushed to.</param>
+        </member>
+        <member name="M:Engine.ChunkProcessor.SetOrigin(System.ValueTuple{System.Int32,System.Int32})">
+            <summary>
+            Sets the origin.
+            </summary>
+            <param name="position">The position.</param>
+            <remarks>
+            Loading jobs that are too far away from the origin will be skipped.
+            </remarks>
+        </member>
+        <member name="M:Engine.ChunkProcessor.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.ChunkProcessor.Loop">
+            <summary>
+            Processes all the incoming loading requests.
+            </summary>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/> that persists until the application closes.</returns>
+        </member>
+        <member name="T:Engine.Configuration">
+            <summary>
+            Global settings for the chunk engine.
+            </summary>
+        </member>
+        <member name="F:Engine.Configuration.TileSize">
+            <summary>
+            The tile width and height, in pixels.
+            </summary>
+        </member>
+        <member name="F:Engine.Configuration.ChunkWidth">
+            <summary>
+            The chunk width, in tile units.
+            </summary>
+        </member>
+        <member name="F:Engine.Configuration.ChunkHeight">
+            <summary>
+            The chunk height, in tile units.
+            </summary>
+        </member>
+        <member name="F:Engine.Configuration.ChunkViewRange">
+            <summary>
+            The distance how far ahead the chunks get preloaded in relation to the current chunk (where the character or camera is located).
+            Lower values mean more aggressive loading. Higher values pre-load further in advance, but more at a time.
+            </summary>
+        </member>
+        <member name="F:Engine.Configuration.ChunkViewFalloffRange">
+            <summary>
+            The distance how far off a chunk can get until it gets recycled.
+            </summary>
+        </member>
+        <member name="T:Engine.ContentManager">
+            <summary>
+            Provides access to the game assets.
+            </summary>
+        </member>
+        <member name="F:Engine.ContentManager.game">
+            <summary>
+            Stores the associated <see cref="T:Engine.Game"/>.
+            </summary>
+        </member>
+        <member name="M:Engine.ContentManager.#ctor(Engine.Game)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.ContentManager"/> class.
+            </summary>
+            <param name="game">The game.</param>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="game"/> cannot be <c>null</c>.</exception>
+        </member>
+        <member name="M:Engine.ContentManager.LoadChunkData(System.ValueTuple{System.Int32,System.Int32},System.UInt16[])">
+            <summary>
+            Loads the specified map chunk.
+            </summary>
+            <param name="position">The position, in chunk units.</param>
+            <param name="fillTo">The target array to which the data will be written.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/>.</returns>
+            <exception cref="T:System.ArgumentNullException">The <paramref name="fillTo"/> cannot be <c>null</c>.</exception>
+        </member>
+        <member name="M:Engine.ContentManager.LoadShader(Veldrid.ResourceFactory,System.String,Veldrid.ShaderStages,System.String)">
+            <summary>
+            Loads the shader.
+            </summary>
+            <param name="factory">The resource factory.</param>
+            <param name="set">The shader name.</param>
+            <param name="stage">Either 'Vertex' (for vertex shader), or 'Fragment' (for fragment/pixel shader).</param>
+            <param name="entryPoint">The entry point.</param>
+            <returns>The <see cref="T:Veldrid.Shader"/>.</returns>
+            <remarks>Supports HLSL, GLSL, Metal and Vulcan shaders.</remarks>
+        </member>
+        <member name="M:Engine.ContentManager.LoadTexture(Veldrid.ResourceFactory,System.String)">
+            <summary>
+            Loads the texture.
+            </summary>
+            <param name="factory">The resource factory.</param>
+            <param name="filename">The filename.</param>
+            <returns>The <see cref="T:Veldrid.Texture"/>.</returns>
+        </member>
+        <member name="M:Engine.ContentManager.LoadTexture(Veldrid.ResourceFactory,System.IO.Stream)">
+            <summary>
+            Loads the texture.
+            </summary>
+            <param name="factory">The resource factory.</param>
+            <param name="stream">The stream.</param>
+            <returns>The <see cref="T:Veldrid.Texture"/>.</returns>
+        </member>
+        <member name="M:Engine.ContentManager.GetShaderExtension(Veldrid.GraphicsBackend)">
+            <summary>
+            Gets the shader file extension based on the graphics backend.
+            </summary>
+            <param name="backendType">The backend type.</param>
+            <returns>The file extension.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Unknown graphics backend.</exception>
+        </member>
+        <member name="M:Engine.ContentManager.FilenameForChunk(System.Int32,System.Int32)">
+            <summary>
+            Determines a filename for the given chunk coordinates.
+            </summary>
+            <param name="x">The chunk X coordinate.</param>
+            <param name="y">The chunk Y coordinate.</param>
+            <returns>The filename.</returns>
+        </member>
+        <member name="T:Engine.Game">
+            <summary>
+            The game base class.
+            </summary>
+        </member>
+        <member name="M:Engine.Game.#ctor(Engine.IGameWindow)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.Game"/> class.
+            </summary>
+            <param name="window">The window.</param>
+            <exception cref="T:System.ArgumentException">The <paramref name="window"/> cannot be <c>null</c>.</exception>
+        </member>
+        <member name="P:Engine.Game.Window">
+            <summary>
+            Gets the window.
+            </summary>
+        </member>
+        <member name="P:Engine.Game.GraphicsDevice">
+            <summary>
+            Gets the graphics device.
+            </summary>
+        </member>
+        <member name="P:Engine.Game.ResourceFactory">
+            <summary>
+            Gets the resource factory.
+            </summary>
+        </member>
+        <member name="P:Engine.Game.Swapchain">
+            <summary>
+            Gets the swapchain.
+            </summary>
+        </member>
+        <member name="M:Engine.Game.OpenEmbeddedAssetStream(System.String)">
+            <summary>
+            Opens the embedded asset stream.
+            </summary>
+            <param name="name">The resource name.</param>
+            <returns>The <see cref="T:System.IO.Stream"/>.</returns>
+        </member>
+        <member name="M:Engine.Game.ReadEmbeddedAssetBytes(System.String)">
+            <summary>
+            Reads the embedded asset into a byte array.
+            </summary>
+            <param name="name">The resource name.</param>
+            <returns>The byte array.</returns>
+        </member>
+        <member name="M:Engine.Game.CreateResources(Veldrid.ResourceFactory)">
+            <summary>
+            Loads the game resources.
+            </summary>
+            <param name="factory">The resource factory.</param>
+        </member>
+        <member name="M:Engine.Game.FreeResources">
+            <summary>
+            Frees all allocated resources.
+            </summary>
+        </member>
+        <member name="M:Engine.Game.Update(System.Single)">
+            <summary>
+            Updates the game state before rendering.
+            </summary>
+            <param name="deltaSeconds">The elapsed seconds since the last frame.</param>
+        </member>
+        <member name="M:Engine.Game.Draw(System.Single)">
+            <summary>
+            Renders the game.
+            </summary>
+            <param name="deltaSeconds">The elapsed seconds since the last frame.</param>
+        </member>
+        <member name="M:Engine.Game.OnWindowResized(System.UInt32,System.UInt32)">
+            <summary>
+            Called when the window has been resized.
+            </summary>
+            <param name="width">The new pixel width.</param>
+            <param name="height">The new pixel height.</param>
+        </member>
+        <member name="M:Engine.Game.OnKeyDown(Veldrid.KeyEvent)">
+            <summary>
+            Called when a key has been pressed down.
+            </summary>
+            <param name="state">The key state info.</param>
+        </member>
+        <member name="M:Engine.Game.Exit">
+            <summary>
+            Closes the application.
+            </summary>
+        </member>
+        <member name="M:Engine.Game.OnGraphicsDeviceCreated(Veldrid.GraphicsDevice,Veldrid.ResourceFactory,Veldrid.Swapchain)">
+            <summary>
+            Called when the graphics device has been created.
+            </summary>
+            <param name="device">The graphics device.</param>
+            <param name="factory">The resource factory.</param>
+            <param name="swapchain">The swapchain.</param>
+        </member>
+        <member name="M:Engine.Game.OnDeviceDestroyed">
+            <summary>
+            Called when the device has been destroyed.
+            </summary>
+        </member>
+        <member name="T:Engine.GameWindow">
+            <summary>
+            The game window.
+            </summary>
+            <seealso cref="T:Engine.IGameWindow" />
+        </member>
+        <member name="F:Engine.GameWindow.window">
+            <summary>
+            The SDL window.
+            </summary>
+        </member>
+        <member name="F:Engine.GameWindow.graphicsDevice">
+            <summary>
+            The graphics device.
+            </summary>
+        </member>
+        <member name="F:Engine.GameWindow.resourceFactory">
+            <summary>
+            The resource factory.
+            </summary>
+        </member>
+        <member name="F:Engine.GameWindow.windowResized">
+            <summary>
+            Temporarily stores a flag indicating whether the window has just been resized.
+            </summary>
+        </member>
+        <member name="M:Engine.GameWindow.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.GameWindow"/> class.
+            </summary>
+            <param name="title">The title.</param>
+        </member>
+        <member name="E:Engine.GameWindow.Rendering">
+            <inheritdoc />
+        </member>
+        <member name="E:Engine.GameWindow.GraphicsDeviceCreated">
+            <inheritdoc />
+        </member>
+        <member name="E:Engine.GameWindow.GraphicsDeviceDestroyed">
+            <inheritdoc />
+        </member>
+        <member name="E:Engine.GameWindow.Resized">
+            <inheritdoc />
+        </member>
+        <member name="E:Engine.GameWindow.KeyPressed">
+            <inheritdoc />
+        </member>
+        <member name="P:Engine.GameWindow.Width">
+            <inheritdoc />
+        </member>
+        <member name="P:Engine.GameWindow.Height">
+            <inheritdoc />
+        </member>
+        <member name="P:Engine.GameWindow.Title">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.GameWindow.Close">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.GameWindow.Run(Veldrid.GraphicsBackend)">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.GameWindow.OnKeyDown(Veldrid.KeyEvent)">
+            <summary>
+            Called when a key has been pressed.
+            </summary>
+            <param name="keyEvent">The key event.</param>
+        </member>
+        <member name="T:Engine.IGameWindow">
+            <summary>
+            The game window.
+            </summary>
+        </member>
+        <member name="E:Engine.IGameWindow.Rendering">
+            <summary>
+            Occurs when the game is rendering.
+            </summary>
+        </member>
+        <member name="E:Engine.IGameWindow.GraphicsDeviceCreated">
+            <summary>
+            Occurs when the graphics device has been created.
+            </summary>
+        </member>
+        <member name="E:Engine.IGameWindow.GraphicsDeviceDestroyed">
+            <summary>
+            Occurs when the graphics device has been destroyed.
+            </summary>
+        </member>
+        <member name="E:Engine.IGameWindow.Resized">
+            <summary>
+            Occurs when the game window has been resized (and the buffers might need resized as well).
+            </summary>
+        </member>
+        <member name="E:Engine.IGameWindow.KeyPressed">
+            <summary>
+            Occurs when a key has been pressed.
+            </summary>
+        </member>
+        <member name="P:Engine.IGameWindow.Width">
+            <summary>
+            Gets the window width, in pixels.
+            </summary>
+        </member>
+        <member name="P:Engine.IGameWindow.Height">
+            <summary>
+            Gets the window height, in pixels.
+            </summary>
+        </member>
+        <member name="P:Engine.IGameWindow.Title">
+            <summary>
+            Gets or sets the window title.
+            </summary>
+        </member>
+        <member name="M:Engine.IGameWindow.Close">
+            <summary>
+            Closes the window.
+            </summary>
+        </member>
+        <member name="M:Engine.IGameWindow.Run(Veldrid.GraphicsBackend)">
+            <summary>
+            Runs the game.
+            </summary>
+            <param name="graphicsAPI">The graphics API.</param>
+        </member>
+        <member name="T:Engine.InputTracker">
+            <summary>
+            Provides access to the latest snapshot of keyboard and mouse state.
+            </summary>
+        </member>
+        <member name="F:Engine.InputTracker.MousePosition">
+            <summary>
+            The current mouse position.
+            </summary>
+        </member>
+        <member name="F:Engine.InputTracker.CurrentlyPressedKeys">
+            <summary>
+            Keeps track of the pressed keys.
+            </summary>
+        </member>
+        <member name="F:Engine.InputTracker.NewKeysThisFrame">
+            <summary>
+            Lists the key state changes in the most recent update.
+            </summary>
+        </member>
+        <member name="F:Engine.InputTracker.CurrentlyPressedMouseButtons">
+            <summary>
+            Keeps track of the pressed mouse buttons.
+            </summary>
+        </member>
+        <member name="F:Engine.InputTracker.NewMouseButtonsThisFrame">
+            <summary>
+            Lists the mouse button state changes in the most recent update.
+            </summary>
+        </member>
+        <member name="P:Engine.InputTracker.FrameSnapshot">
+            <summary>
+            Gets the most recent snapshot.
+            </summary>
+        </member>
+        <member name="M:Engine.InputTracker.GetKey(Veldrid.Key)">
+            <summary>
+            Gets the key state.
+            </summary>
+            <param name="key">The key.</param>
+            <returns><c>true</c> if the key is currently pressed.</returns>
+        </member>
+        <member name="M:Engine.InputTracker.GetKeyDown(Veldrid.Key)">
+            <summary>
+            Gets the key state.
+            </summary>
+            <param name="key">The key.</param>
+            <returns><c>true</c> if the key was just pressed down in the most recent update.</returns>
+        </member>
+        <member name="M:Engine.InputTracker.GetMouseButton(Veldrid.MouseButton)">
+            <summary>
+            Gets the mouse button state.
+            </summary>
+            <param name="button">The button.</param>
+            <returns><c>true</c> if the button is currently pressed.</returns>
+        </member>
+        <member name="M:Engine.InputTracker.GetMouseButtonDown(Veldrid.MouseButton)">
+            <summary>
+            Gets the mouse button state.
+            </summary>
+            <param name="button">The button.</param>
+            <returns><c>true</c> if the button was just pressed down in the most recent update.</returns>
+        </member>
+        <member name="M:Engine.InputTracker.UpdateFrameInput(Veldrid.InputSnapshot)">
+            <summary>
+            Processes the snapshot.
+            </summary>
+            <param name="snapshot">The snapshot.</param>
+        </member>
+        <member name="M:Engine.InputTracker.MouseUp(Veldrid.MouseButton)">
+            <summary>
+            Handles a mouse button release event.
+            </summary>
+            <param name="mouseButton">The mouse button.</param>
+        </member>
+        <member name="M:Engine.InputTracker.MouseDown(Veldrid.MouseButton)">
+            <summary>
+            Handles a mouse button press event.
+            </summary>
+            <param name="mouseButton">The mouse button.</param>
+        </member>
+        <member name="M:Engine.InputTracker.KeyUp(Veldrid.Key)">
+            <summary>
+            Handles a key release event.
+            </summary>
+            <param name="key">The key.</param>
+        </member>
+        <member name="M:Engine.InputTracker.KeyDown(Veldrid.Key)">
+            <summary>
+            Handles a key press event.
+            </summary>
+            <param name="key">The key.</param>
+        </member>
+        <member name="T:Engine.Pool`1">
+            <summary>
+            Implements a pool of recyclable resources.
+            </summary>
+            <typeparam name="T">The object type>.</typeparam>
+        </member>
+        <member name="F:Engine.Pool`1.pool">
+            <summary>
+            Stores the internal object instance reserve.
+            </summary>
+        </member>
+        <member name="F:Engine.Pool`1.borrowedItems">
+            <summary>
+            Keeps track of the withdrawn objects.
+            </summary>
+        </member>
+        <member name="M:Engine.Pool`1.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.Pool`1"/> class.
+            </summary>
+            <param name="capacity">The capacity.</param>
+            <exception cref="T:System.ArgumentException">The <paramref name="capacity"/> must be greater than zero.</exception>
+        </member>
+        <member name="P:Engine.Pool`1.CanWithdraw">
+            <summary>
+            Gets a value indicating whether the pool has any items left for withdrawal.
+            </summary>
+        </member>
+        <member name="M:Engine.Pool`1.Withdraw">
+            <summary>
+            Pulls a free item from the pool.
+            </summary>
+            <returns>The item.</returns>
+            <exception cref="T:System.InvalidOperationException">The pool is exhausted.</exception>
+        </member>
+        <member name="M:Engine.Pool`1.Return(`0)">
+            <summary>
+            Returns the specified item back to the pool.
+            </summary>
+            <param name="item">The item.</param>
+            <exception cref="T:System.InvalidOperationException">The returned item did not belong to the pool.</exception>
+        </member>
+        <member name="T:Engine.Program">
+            <summary>
+            The demo app.
+            </summary>
+        </member>
+        <member name="M:Engine.Program.Main(System.String[])">
+            <summary>
+            Program entry point.
+            </summary>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:Engine.SampleGame">
+            <summary>
+            Our sample game.
+            </summary>
+            <seealso cref="T:Engine.Game" />
+        </member>
+        <member name="M:Engine.SampleGame.#ctor(Engine.IGameWindow)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.SampleGame"/> class.
+            </summary>
+            <param name="window">The game window.</param>
+        </member>
+        <member name="P:Engine.SampleGame.Content">
+            <summary>
+            Gets the content manager.
+            </summary>
+        </member>
+        <member name="P:Engine.SampleGame.Chunks">
+            <summary>
+            Gets the chunk manager.
+            </summary>
+        </member>
+        <member name="M:Engine.SampleGame.CreateResources(Veldrid.ResourceFactory)">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.SampleGame.FreeResources">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.SampleGame.Draw(System.Single)">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.SampleGame.Update(System.Single)">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.SampleGame.OnKeyDown(Veldrid.KeyEvent)">
+            <inheritdoc />
+        </member>
+        <member name="M:Engine.SampleGame.GenerateTilemapVertices">
+            <summary>
+            Generates the tilemap vertices.
+            </summary>
+            <returns>Generates the vertex and index data for the grid used for rendering the tilemap.</returns>
+        </member>
+        <member name="T:Engine.SampleGame.VertexPositionTextureColor">
+            <summary>
+            Defines a vertex point that contains Position, Texture, and Color info.
+            </summary>
+        </member>
+        <member name="F:Engine.SampleGame.VertexPositionTextureColor.SizeInBytes">
+            <summary>
+            The size of this structure, in bytes.
+            </summary>
+        </member>
+        <member name="F:Engine.SampleGame.VertexPositionTextureColor.Position">
+            <summary>
+            The position.
+            </summary>
+        </member>
+        <member name="F:Engine.SampleGame.VertexPositionTextureColor.UV">
+            <summary>
+            The texture coordinates.
+            </summary>
+        </member>
+        <member name="F:Engine.SampleGame.VertexPositionTextureColor.Color">
+            <summary>
+            The color.
+            </summary>
+        </member>
+        <member name="M:Engine.SampleGame.VertexPositionTextureColor.#ctor(System.Numerics.Vector2,System.Numerics.Vector2,Veldrid.RgbaFloat)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.SampleGame.VertexPositionTextureColor"/> struct.
+            </summary>
+            <param name="position">The position.</param>
+            <param name="uv">The texture coordinates.</param>
+            <param name="color">The color.</param>
+        </member>
+        <member name="M:Engine.SampleGame.VertexPositionTextureColor.#ctor(System.Numerics.Vector2,System.Numerics.Vector2)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.SampleGame.VertexPositionTextureColor"/> struct.
+            </summary>
+            <param name="position">The position.</param>
+            <param name="uv">The texture coordinates.</param>
+        </member>
+        <member name="T:Engine.Tileset">
+            <summary>
+            Provides tileset specific calculations.
+            </summary>
+        </member>
+        <member name="M:Engine.Tileset.#ctor(System.UInt32,System.UInt32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Engine.Tileset"/> class.
+            </summary>
+            <param name="pixelWidth">The width of the tileset atlas texture, in pixels.</param>
+            <param name="pixelHeight">The height of the tileset atlas texture, in pixels.</param>
+            <exception cref="T:System.InvalidOperationException">Tileset must have positive area.</exception>
+        </member>
+        <member name="P:Engine.Tileset.Width">
+            <summary>
+            Gets the width, in tile units.
+            </summary>
+        </member>
+        <member name="P:Engine.Tileset.Height">
+            <summary>
+            Gets the height, in tile units.
+            </summary>
+        </member>
+        <member name="P:Engine.Tileset.Count">
+            <summary>
+            Gets the total tile count.
+            </summary>
+        </member>
+        <member name="M:Engine.Tileset.IndexAt(System.Int32,System.Int32)">
+            <summary>
+            Gets the tile index at the given row and column. The index is zero-based.
+            </summary>
+            <param name="row">The row. Zero-based.</param>
+            <param name="column">The column. Zero-based.</param>
+            <returns>The zero-based tile index.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            The row was out of range.
+            or
+            The column was out of range.
+            </exception>
+        </member>
+        <member name="M:Engine.Tileset.FromIndex(System.Int32)">
+            <summary>
+            Gets the row and column for the corresponding index. All units are zero-based.
+            </summary>
+            <param name="index">The index. Zero-based.</param>
+            <returns>The row and column. Zero-based.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">The index was out of range.</exception>
+        </member>
+        <member name="M:Engine.Tileset.GetTileUV(System.Int32)">
+            <summary>
+            Gets the texture UV coordinates for the specified tile index.
+            </summary>
+            <param name="index">The index. Zero-based.</param>
+            <returns>The <see cref="T:System.ValueTuple`2"/> representing the top-left and bottom-right corners of the texture region.
+            Each <see cref="T:System.Single"/> is between 0 and 1 where 0 is left/top and 1 right/bottom.</returns>
+        </member>
+        <member name="T:Engine.Utility">
+            <summary>
+            Provides various utility methods.
+            </summary>
+        </member>
+        <member name="M:Engine.Utility.DivFloor(System.Int32,System.Int32)">
+            <summary>
+            Divides the two integers, rounding the result towards negative infinity.
+            The operation is equivalent to <c>(int)Math.Floor((double)a / b)</c>, but operates on integers, is faster, and does not need rounding or conversion.
+            </summary>
+            <param name="a">The dividend.</param>
+            <param name="b">The divisor.</param>
+            <returns>The <c>Floor</c> value after the division.</returns>
+        </member>
+        <member name="M:Engine.Utility.ModFloor(System.Int32,System.Int32)">
+            <summary>
+            Calculates the remainder after division of the two integers. The division result is first rounded towards negative infinity.
+            This operation is the modulo of the corresponding <see cref="M:Engine.Utility.DivFloor(System.Int32,System.Int32)"/> operation.
+            </summary>
+            <param name="a">The dividend.</param>
+            <param name="b">The divisor.</param>
+            <returns>The remainder of the floored division operation.</returns>
+        </member>
+        <member name="M:Engine.Utility.SquaredDistance(System.ValueTuple{System.Int32,System.Int32},System.ValueTuple{System.Int32,System.Int32})">
+            <summary>
+            Calculates the squared distance between two points.
+            </summary>
+            <param name="p1">The first point.</param>
+            <param name="p2">The second point.</param>
+            <returns>The squared distance.</returns>
+        </member>
+    </members>
+</doc>

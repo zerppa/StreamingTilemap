@@ -1,0 +1,77 @@
+﻿<Window x:Class="Editor.TilesetWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Editor"
+        mc:Ignorable="d"
+        Name="Root"
+        WindowStyle="ToolWindow"
+        SizeToContent="WidthAndHeight"
+        Topmost="True"
+        Title="Tileset"
+        UseLayoutRounding="True"
+        d:DataContext ="{d:DesignInstance {x:Type local:TilesetViewModel}, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <!-- Used from the code-behind -->
+        <Storyboard x:Key="PlayAnimation" Storyboard.TargetProperty="Opacity">
+            <DoubleAnimation From="1.0" To="0.0" Duration="0:0:1"/>
+        </Storyboard>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5">Fore</TextBlock>
+            <Border Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" BorderThickness="1" BorderBrush="Red" Background="Black" Margin="5">
+                <Image Source="{Binding ForeTile}" Width="{Binding TileWidth, Mode=OneWay, FallbackValue=0}" Height="{Binding TileHeight, Mode=OneWay, FallbackValue=0}" Stretch="None"/>
+            </Border>
+            <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="{Binding ForeTileIndex, Mode=OneWay, FallbackValue=0}"/>
+            <Button Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Command="{Binding ClearForeCommand, Mode=OneWay}" Margin="5">Clear</Button>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5">Back</TextBlock>
+            <Border Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" BorderThickness="1" BorderBrush="Red" Background="Black" Margin="5">
+                <Image Source="{Binding BackTile}" Width="{Binding TileWidth, Mode=OneWay, FallbackValue=0}" Height="{Binding TileHeight, Mode=OneWay, FallbackValue=0}" Stretch="None"/>
+            </Border>
+            <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="5" Text="{Binding BackTileIndex, Mode=OneWay, FallbackValue=0}"/>
+            <Button Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" Command="{Binding ClearBackCommand, Mode=OneWay}" Margin="5">Clear</Button>
+        </Grid>
+        <Border Grid.Row="1" Margin="0 10 0 0" BorderThickness="1" BorderBrush="Red" Background="Black" HorizontalAlignment="Left">
+            <Grid>
+                <Image Name="TilesetImage"
+                       Source="{Binding Bitmap, Mode=OneWay}"
+                       Width="{Binding Bitmap.PixelWidth, Mode=OneWay, FallbackValue=0}"
+                       Height="{Binding Bitmap.PixelHeight, Mode=OneWay, FallbackValue=0}"
+                       Stretch="None"/>
+                <Grid Background="Transparent" MouseDown="OnMouseDown" MouseMove="OnMouseMove" Margin="0 0 1 1"/>
+                <Canvas IsHitTestVisible="False">
+                    <Border Name="PickerRectangle"
+                            Canvas.Left="{Binding Picker.Left, ElementName=Root, Mode=OneWay}"
+                            Canvas.Top="{Binding Picker.Top, ElementName=Root, Mode=OneWay}"
+                            Width="{Binding Picker.Width, ElementName=Root, Mode=OneWay}"
+                            Height="{Binding Picker.Height, ElementName=Root, Mode=OneWay}"
+                            BorderThickness="1"
+                            BorderBrush="#88000000"
+                            Opacity="0">
+                        <Border BorderThickness="1" BorderBrush="#88FFFFFF"></Border>
+                    </Border>
+                </Canvas>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
