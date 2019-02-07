@@ -7,16 +7,16 @@
     /// </summary>
     public class Chunk
     {
-        /// <summary>
-        /// The lock for multi-threaded access.
-        /// </summary>
-        private readonly object syncRoot = new object();
-
 #pragma warning disable SA1401 // Fields should be private
         /// <summary>
         /// The flag indicating whether this chunk is currently active (and not in the pool).
         /// </summary>
         internal volatile bool IsInUse;
+
+        /// <summary>
+        /// The lock for multi-threaded access.
+        /// </summary>
+        private readonly object syncRoot = new object();
 
         /// <summary>
         /// Points to the currently used tile buffer.

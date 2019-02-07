@@ -175,8 +175,6 @@
             this.chunkProcessor?.Dispose();
         }
 
-        
-
         /// <summary>
         /// Gets the chunks surrounding and including the center chunk.
         /// The returned collection is sorted from closest to farthest.
