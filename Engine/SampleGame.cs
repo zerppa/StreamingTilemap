@@ -1,7 +1,5 @@
 ﻿namespace Engine
 {
-    using System.Diagnostics;
-    using System.Globalization;
     using System.Numerics;
 
     using Veldrid;
@@ -96,7 +94,7 @@
 
             this.mainLayout = factory.CreateResourceLayout(
                 new ResourceLayoutDescription(
-                    new ResourceLayoutElementDescription("OrthographicProjection", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+                    new ResourceLayoutElementDescription("Projection", ResourceKind.UniformBuffer, ShaderStages.Vertex),
                     new ResourceLayoutElementDescription("SpriteSampler", ResourceKind.Sampler, ShaderStages.Fragment)));
 
             this.textureLayout = factory.CreateResourceLayout(
@@ -231,13 +229,6 @@
         /// <inheritdoc />
         protected override void Update(float deltaSeconds)
         {
-            //var fps = (int)(1f / deltaSeconds);
-            //this.Window.Title = fps.ToString(CultureInfo.InvariantCulture);
-            //if (fps < 50)
-            //{
-            //    Debug.WriteLine(fps);
-            //}
-
             // Ensure that just loaded chunk data is complete
             this.Chunks.ApplyAllPendingChanges();
 

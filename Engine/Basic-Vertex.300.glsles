@@ -1,6 +1,6 @@
 #version 300 es
 
-layout(std140) uniform OrthographicProjection
+uniform Projection
 {
     mat4 projection_matrix;
 };

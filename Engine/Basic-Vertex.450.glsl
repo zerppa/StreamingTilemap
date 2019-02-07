@@ -22,7 +22,7 @@ out gl_PerVertex
 
 void main() 
 {
-    gl_Position = projection * vec4(vsin_position.x, -vsin_position.y, 0, 1);
+    gl_Position = projection * vec4(vsin_position.x, vsin_position.y, 0, 1);
     vsout_color = vsin_color;
     vsout_texCoord = vsin_texCoord;
     gl_Position.y = -gl_Position.y;
