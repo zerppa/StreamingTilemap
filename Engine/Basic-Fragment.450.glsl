@@ -10,7 +10,7 @@ layout (location = 0) in vec4 color;
 layout (location = 1) in vec2 texCoord;
 layout (location = 0) out vec4 outputColor;
 
-void main()
+void FS()
 {
     outputColor = color * texture(sampler2D(SpriteTexture, SpriteSampler), texCoord);
 }

@@ -20,7 +20,7 @@ out gl_PerVertex
     vec4 gl_Position;
 };
 
-void main() 
+void VS() 
 {
     gl_Position = projection * vec4(vsin_position.x, vsin_position.y, 0, 1);
     vsout_color = vsin_color;
