@@ -7,7 +7,7 @@
     /// <summary>
     /// Implements a pool of recyclable resources.
     /// </summary>
-    /// <typeparam name="T">The object type>.</typeparam>
+    /// <typeparam name="T">The object type.</typeparam>
     public class Pool<T>
         where T : new()
     {
