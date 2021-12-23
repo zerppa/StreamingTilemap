@@ -28,8 +28,8 @@
             this.tileset = this.Context.AssetManager.GetTileset();
 
             this.Bitmap = new WriteableBitmap(
-                (int)this.tileset.PixelWidth,
-                (int)this.tileset.PixelHeight,
+                this.tileset.PixelWidth,
+                this.tileset.PixelHeight,
                 96,
                 96,
                 PixelFormats.Bgr32,

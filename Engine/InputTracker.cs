@@ -22,22 +22,22 @@
         /// <summary>
         /// Keeps track of the pressed keys.
         /// </summary>
-        private static readonly HashSet<Key> CurrentlyPressedKeys = new HashSet<Key>();
+        private static readonly HashSet<Key> CurrentlyPressedKeys = new ();
 
         /// <summary>
         /// Lists the key state changes in the most recent update.
         /// </summary>
-        private static readonly HashSet<Key> NewKeysThisFrame = new HashSet<Key>();
+        private static readonly HashSet<Key> NewKeysThisFrame = new ();
 
         /// <summary>
         /// Keeps track of the pressed mouse buttons.
         /// </summary>
-        private static readonly HashSet<MouseButton> CurrentlyPressedMouseButtons = new HashSet<MouseButton>();
+        private static readonly HashSet<MouseButton> CurrentlyPressedMouseButtons = new ();
 
         /// <summary>
         /// Lists the mouse button state changes in the most recent update.
         /// </summary>
-        private static readonly HashSet<MouseButton> NewMouseButtonsThisFrame = new HashSet<MouseButton>();
+        private static readonly HashSet<MouseButton> NewMouseButtonsThisFrame = new ();
 
         /// <summary>
         /// Gets the most recent snapshot.

@@ -16,7 +16,7 @@
         /// <summary>
         /// The lock for multi-threaded access.
         /// </summary>
-        private readonly object syncRoot = new object();
+        private readonly object syncRoot = new ();
 
         /// <summary>
         /// Points to the currently used tile buffer.
@@ -91,9 +91,7 @@
             {
                 if (this.hasPendingChanges)
                 {
-                    var temp = this.backBuffer;
-                    this.backBuffer = this.currentBuffer;
-                    this.currentBuffer = temp;
+                    (this.backBuffer, this.currentBuffer) = (this.currentBuffer, this.backBuffer);
                     this.hasPendingChanges = false;
                 }
             }

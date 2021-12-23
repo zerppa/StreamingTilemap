@@ -45,7 +45,7 @@
         /// Gets the specified chunk's data and sets the <paramref name="tiles"/> array with it.
         /// </summary>
         /// <param name="chunkX">The chunk X coordinate in chunk units.</param>
-        /// <param name="chunkY">The chunk Y coordinate in chunk units</param>
+        /// <param name="chunkY">The chunk Y coordinate in chunk units.</param>
         /// /// <param name="tiles">The tiles.</param>
         public void LoadTiles(int chunkX, int chunkY, int[,] tiles)
         {
@@ -102,7 +102,7 @@
         /// Stores the specified chunk's data.
         /// </summary>
         /// <param name="chunkX">The chunk X coordinate in chunk units.</param>
-        /// <param name="chunkY">The chunk Y coordinate in chunk units</param>
+        /// <param name="chunkY">The chunk Y coordinate in chunk units.</param>
         /// <param name="tiles">The tiles.</param>
         public void SaveTiles(int chunkX, int chunkY, int[,] tiles)
         {

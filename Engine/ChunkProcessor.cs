@@ -20,12 +20,12 @@
         /// <summary>
         /// The producer-consumer implementation.
         /// </summary>
-        private readonly BlockingCollection<(int, int, Chunk)> jobProcessor = new BlockingCollection<(int, int, Chunk)>(100);
+        private readonly BlockingCollection<(int, int, Chunk)> jobProcessor = new (100);
 
         /// <summary>
         /// Keeps track of the currently queued chunks.
         /// </summary>
-        private readonly ConcurrentDictionary<(int x, int y), Chunk> queuedJobs = new ConcurrentDictionary<(int x, int y), Chunk>();
+        private readonly ConcurrentDictionary<(int x, int y), Chunk> queuedJobs = new ();
 
         /// <summary>
         /// The origin around which chunks are managed. Loading jobs that are too far away from the origin will be skipped.
@@ -76,6 +76,7 @@
         public void Dispose()
         {
             this.jobProcessor.CompleteAdding();
+            this.jobProcessor.Dispose();
         }
 
         /// <summary>

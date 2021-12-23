@@ -31,7 +31,7 @@
         /// <summary>
         /// The temporary list of chunks that have fallen off the managed area and are subject of being recycled.
         /// </summary>
-        private readonly List<KeyValuePair<(int, int), Chunk>> doomedChunks = new List<KeyValuePair<(int, int), Chunk>>();
+        private readonly List<KeyValuePair<(int, int), Chunk>> doomedChunks = new ();
 
         /// <summary>
         /// Contains the pre-calculated ordered list of offsets that can be applied to chunk coordinates
@@ -54,7 +54,7 @@
 
             // Create the pre-calculated surrounding chunk offsets based on range
             var chunkOffsets = new List<(int ox, int oy, int squaredDistance)>((int)Math.Ceiling(Math.PI * (Configuration.ChunkViewRange * Configuration.ChunkViewRange)));
-            const int SquaredMaxDistance = Configuration.ChunkViewRange * Configuration.ChunkViewRange;
+            const int squaredMaxDistance = Configuration.ChunkViewRange * Configuration.ChunkViewRange;
             for (var y = -Configuration.ChunkViewRange; y <= Configuration.ChunkViewRange; y++)
             {
                 for (var x = -Configuration.ChunkViewRange; x <= Configuration.ChunkViewRange; x++)
@@ -62,7 +62,7 @@
                     var dx = Math.Abs(x);
                     var dy = Math.Abs(y);
                     var squaredDistance = dx * dx + dy * dy;
-                    if (squaredDistance <= SquaredMaxDistance)
+                    if (squaredDistance <= squaredMaxDistance)
                     {
                         chunkOffsets.Add((x, y, squaredDistance));
                     }

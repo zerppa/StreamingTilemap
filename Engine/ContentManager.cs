@@ -55,7 +55,7 @@
 
             try
             {
-                using (var stream = File.OpenRead(chunkFile))
+                await using (var stream = File.OpenRead(chunkFile))
                 {
                     using (var reader = new BinaryReader(stream))
                     {
@@ -85,7 +85,7 @@
         /// <remarks>Supports HLSL, GLSL, Metal and Vulcan shaders.</remarks>
         public Shader LoadShader(ResourceFactory factory, string set, ShaderStages stage, string entryPoint)
         {
-            var name = $"{nameof(Engine)}.{set}-{stage.ToString()}.{GetShaderExtension(factory.BackendType)}";
+            var name = $"{nameof(Engine)}.{set}-{stage}.{GetShaderExtension(factory.BackendType)}";
             return factory.CreateShader(new ShaderDescription(stage, this.game.ReadEmbeddedAssetBytes(name), entryPoint));
         }
 
@@ -128,21 +128,15 @@
         {
             var isMacOS = RuntimeInformation.OSDescription.Contains("Darwin", StringComparison.InvariantCultureIgnoreCase);
 
-            switch (backendType)
+            return backendType switch
             {
-                case GraphicsBackend.Direct3D11:
-                    return "hlsl.bytes";
-                case GraphicsBackend.Vulkan:
-                    return "450.spv";
-                case GraphicsBackend.OpenGL:
-                    return "330.glsl";
-                case GraphicsBackend.Metal:
-                    return isMacOS ? "metallib" : "ios.metallib";
-                case GraphicsBackend.OpenGLES:
-                    return "300.glsles";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(backendType), backendType, null);
-            }
+                GraphicsBackend.Direct3D11 => "hlsl.bytes",
+                GraphicsBackend.Vulkan => "450.spv",
+                GraphicsBackend.OpenGL => "330.glsl",
+                GraphicsBackend.Metal => isMacOS ? "metallib" : "ios.metallib",
+                GraphicsBackend.OpenGLES => "300.glsles",
+                _ => throw new ArgumentOutOfRangeException(nameof(backendType), backendType, null)
+            };
         }
 
         /// <summary>
